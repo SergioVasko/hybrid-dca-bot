@@ -1,0 +1,33 @@
+name: Hybrid DCA Monthly Check & Telegram
+
+on:
+  schedule:
+    - cron: '0 13 1 * *'     # 13:00 UTC = 9:00 EDT (summer) / 8:00 EST (winter time)
+  workflow_dispatch:         # allows manual runs
+
+jobs:
+  check-dca:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Run DCA script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: php main.php
+
+      - name: Commit updated files (if changed)
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add hybrid_dca_history.csv cash_buffer.txt || true
+          git commit -m "Update DCA history & cash buffer [auto]" || echo "No changes"
+          git push || echo "Push skipped"
