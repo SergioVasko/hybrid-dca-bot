@@ -1,5 +1,8 @@
 name: Hybrid DCA Monthly Check & Telegram
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '0 13 1 * *'     # 13:00 UTC = 9:00 EDT (summer) / 8:00 EST (winter time)
