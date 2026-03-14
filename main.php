@@ -14,9 +14,6 @@ const FG_CACHE_FILE = 'fear_greed_cache.json';
 const FG_DEBUG_FILE = 'fear_greed_debug.json';
 const DATE_FORMAT_UTC = 'Y-m-d H:i \\U\\T\\C';
 
-define('TELEGRAM_BOT_TOKEN', $_ENV['TELEGRAM_BOT_TOKEN'] ?? '');
-define('TELEGRAM_CHAT_ID', $_ENV['TELEGRAM_CHAT_ID'] ?? '');
-
 function writeFileContents(string $path, string $contents, bool $strict = true): void
 {
     $result = @file_put_contents($path, $contents);
@@ -389,14 +386,17 @@ function appendToCsv(
 
 function sendTelegramMessage(string $message): void
 {
-    if (empty(TELEGRAM_BOT_TOKEN) || empty(TELEGRAM_CHAT_ID)) {
+    $botToken = getenv('TELEGRAM_BOT_TOKEN') ?: ($_ENV['TELEGRAM_BOT_TOKEN'] ?? '');
+    $chatId = getenv('TELEGRAM_CHAT_ID') ?: ($_ENV['TELEGRAM_CHAT_ID'] ?? '');
+
+    if ($botToken === '' || $chatId === '') {
         echo "Telegram not configured\n";
         return;
     }
 
-    $url = 'https://api.telegram.org/bot' . TELEGRAM_BOT_TOKEN . '/sendMessage';
+    $url = 'https://api.telegram.org/bot' . $botToken . '/sendMessage';
     $data = [
-        'chat_id' => TELEGRAM_CHAT_ID,
+        'chat_id' => $chatId,
         'text' => $message,
         'parse_mode' => 'Markdown',
     ];
