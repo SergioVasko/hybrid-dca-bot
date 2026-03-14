@@ -12,6 +12,7 @@ const CSV_FILE = 'hybrid_dca_history.csv';
 const CASH_FILE = 'cash_buffer.txt';
 const FG_CACHE_FILE = 'fear_greed_cache.json';
 const FG_DEBUG_FILE = 'fear_greed_debug.json';
+const DATE_FORMAT_UTC = 'Y-m-d H:i \\U\\T\\C';
 
 define('TELEGRAM_BOT_TOKEN', $_ENV['TELEGRAM_BOT_TOKEN'] ?? '');
 define('TELEGRAM_CHAT_ID', $_ENV['TELEGRAM_CHAT_ID'] ?? '');
@@ -203,7 +204,7 @@ function getFearAndGreed(): array
 function saveFearAndGreedDebug(array $data): void
 {
     $summary = [
-        'timestamp' => nowUtc()->format('Y-m-d H:i UTC'),
+        'timestamp' => nowUtc()->format(DATE_FORMAT_UTC),
         'top_level_keys' => array_keys($data),
         'fear_and_greed_keys' => isset($data['fear_and_greed'])
             && is_array($data['fear_and_greed'])
@@ -313,7 +314,7 @@ function saveFearAndGreedCache(int $value, string $rating): void
     $payload = [
         'value' => $value,
         'rating' => $rating,
-        'timestamp' => nowUtc()->format('Y-m-d H:i UTC'),
+        'timestamp' => nowUtc()->format(DATE_FORMAT_UTC),
     ];
     writeFileContents(FG_CACHE_FILE, encodeJson($payload));
 }
@@ -413,7 +414,7 @@ function sendTelegramMessage(string $message): void
 function main(): void
 {
     $now = nowUtc();
-    $dateStr = $now->format('Y-m-d H:i UTC');
+    $dateStr = $now->format(DATE_FORMAT_UTC);
 
     echo "=== Hybrid DCA Checker ===\n";
     echo "Run time: $dateStr\n\n";
